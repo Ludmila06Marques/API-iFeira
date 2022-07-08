@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import appRouter from './routes/appRouter.js';
 import authRouter from './routes/authRouter.js';
 import productsRouter from "./routes/productsRouter.js";
+import categoriesRouter from "./routes/categoriesRouter.js";
 
 //LINK PARA ROTAS NO FRONT : https://ifeiraapp.herokuapp.com/ 
 
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(authRouter);
 app.use(appRouter);
 app.use(productsRouter);
+app.use(categoriesRouter);
 
 
 
