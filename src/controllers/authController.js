@@ -1,6 +1,7 @@
 import { userSchema , loginSchema} from "../schemas/authSchema.js"
 import bcrypt from 'bcrypt';
 import { db } from "../dbStrategy/mongo.js";
+import { v4 as uuid } from "uuid";
 
 export async function createUser(req,res){
     const usuario = req.body;
@@ -44,12 +45,12 @@ export async function loginuser(req,res){
 
     try {
 
-    const userExist=  await db.collection("users").findOne({email:usuario.email  })
+    const userExist = await db.collection("users").findOne({ email:usuario.email })
 
 
     if(userExist && bcrypt.compareSync(usuario.password , userExist.password)){
 
-        const token= uuid()
+        const token = uuid();
         await db.collection('sessoes').insertOne({token , userId:userExist._id })
     
         
