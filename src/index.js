@@ -1,28 +1,25 @@
-import express from "express"
-import cors from "cors"
-import dotenv from "dotenv"
-import appRouter from './routes/appRouter.js'
-import authRouter from './routes/authRouter.js'
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import appRouter from './routes/appRouter.js';
+import authRouter from './routes/authRouter.js';
+import productsRouter from "./routes/productsRouter.js";
 
 //LINK PARA ROTAS NO FRONT : https://ifeiraapp.herokuapp.com/ 
 
-dotenv.config()
+dotenv.config();
+const app=express();
+app.use(express.json());
+app.use(cors());
 
-const app=express()
-app.use(express.json())
-const corsOptions = {
-	origin: 'http://localhost:3000',
-	optionsSuccessStatus: 200
-}
-app.use(cors(corsOptions));
-
-app.use(authRouter)
-app.use(appRouter)
+app.use(authRouter);
+app.use(appRouter);
+app.use(productsRouter);
 
 
 
 
 
 app.listen(process.env.PORT ,()=>{
-	console.log("ta funfando na" + process.env.PORT)
-})
+	console.log("ta funfando na porta" + process.env.PORT);
+});

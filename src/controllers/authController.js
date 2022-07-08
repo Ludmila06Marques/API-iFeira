@@ -1,7 +1,6 @@
-import { userSchema , loginSchema} from "../schemas/authSchema.js";
-import bcrypt from "bcrypt";
-import {db} from "../dbStrategy/mongo.js";
-
+import { userSchema , loginSchema} from "../schemas/authSchema.js"
+import bcrypt from 'bcrypt';
+import { db } from "../dbStrategy/mongo.js";
 
 export async function createUser(req,res){
     const usuario = req.body;
