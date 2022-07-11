@@ -1,7 +1,7 @@
 import { userSchema , loginSchema} from "../schemas/authSchema.js"
 import bcrypt from 'bcrypt';
 import { db } from "../dbStrategy/mongo.js";
-import { v4 as uuid } from "uuid";
+import {v4 as uuid} from "uuid"
 
 export async function createUser(req,res){
     const usuario = req.body;
@@ -15,57 +15,62 @@ export async function createUser(req,res){
 
     try {
 
+  
         const emailExists=  await db.collection("users").findOne({email:usuario.email })
         if(emailExists){
             return res.status(409).send("Usuario ja cadastrado")
         
         }else{
+
             const userId = await db.collection("users").insertOne({...usuario , password: passwordCripted })
             await db.collection("carts").insertOne({ userId: userId.insertedId, produtos: [] });
         
             return res.status(201).send("usuario criado com sucesso");
-        
 
         }   
-    } catch (error) {
+    
+    
+} catch (error) {
+
     console.log(error)
     return  res.send("deu ruim")
     
     }
 }
-
 export async function loginuser(req,res){
     const usuario=req.body
 
-    const { error } = loginSchema.validate(usuario) 
-    if (error) {
-        console.log(error)
-        return res.sendStatus(422)
+     
+      const { error } = loginSchema.validate(usuario) 
+      if (error) {
+          console.log(error)
+          return res.sendStatus(422)
+      
+      } 
+  
+      try {
+  
+      const userExist=  await db.collection("users").findOne({email:usuario.email  })
+  
     
-    } 
+      if(userExist && bcrypt.compareSync(usuario.password , userExist.password)){
+  
+          const token= uuid()
+          await db.collection('sessoes').insertOne({token , userId:userExist._id })
 
-    try {
-
-    const userExist = await db.collection("users").findOne({ email:usuario.email })
-
-
-    if(userExist && bcrypt.compareSync(usuario.password , userExist.password)){
-
-        const token = uuid();
-        await db.collection('sessoes').insertOne({token , userId:userExist._id })
-    
-        
-        return   res.status(201).send({token , userExist })
-
-        
-    }else{
-        return  res.status(401).send("Senha ou email incorretos")
-        
-
-    }    
-    } catch (error) {
-        console.log(error)
-        return res.send("deu ruim")
-    }
-
-}
+         
+          return   res.status(201).send({token , userExist })
+  
+          
+      }else{
+          return   res.status(401).send("Senha ou email incorretos")
+          
+  
+      }    
+      } catch (error) {
+          console.log(error)
+          return res.send(error)
+      }
+  
+  }
+  
