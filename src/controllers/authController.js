@@ -20,7 +20,8 @@ export async function createUser(req,res){
             return res.status(409).send("Usuario ja cadastrado")
         
         }else{
-            await db.collection("users").insertOne({...usuario , password: passwordCripted })
+            const userId = await db.collection("users").insertOne({...usuario , password: passwordCripted })
+            await db.collection("carts").insertOne({ userId: userId.insertedId, produtos: [] });
         
             return res.status(201).send("usuario criado com sucesso");
         
