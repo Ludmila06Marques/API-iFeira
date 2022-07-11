@@ -10,3 +10,18 @@ export async function listCategories(req, res) {
         return res.sendStatus(500);
     }
 }
+
+export async function listItemsFromCategory(req, res) {
+    console.log(req.body)
+    const category = req.body.category;
+    console.log("alo")
+    console.log(category)
+    try {
+        const productsArray = await db.collection("products").find().toArray();
+        const selectedProductsArray = productsArray.filter(item => {return item.category === category});
+        console.log(selectedProductsArray);
+        res.send(selectedProductsArray).status(200);
+    } catch(error) {
+        res.sendStatus(500);
+    }
+}

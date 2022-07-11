@@ -5,7 +5,7 @@ export async function addProduct(req, res) {
     const product = req.body;
     // name:
     // image:
-    // price:
+    // preco:
     // category: (carnes, verduras, legumes, frutas)
 
     const { error } = productSchema.validate(product);
@@ -48,12 +48,11 @@ export async function addOne(req, res) {
         const cart = await cartsCollection.findOne({ userId: session.userId });
         const products = cart.produtos;
         if (products.some(e => e.name === product)) {
-            console.log("ta no carrinho")
             // Se o produto estiver no carrinho já
             for (let i=0; i<products.length; i++) {
                 if (products[i].name === product) {
                     const quantidade = products[i].qtd + 1;
-                    const array = [{ name: product, qtd: quantidade }, ...products];
+                    const array = [{ name: product, qtd: quantidade, preco: products[i].preco }, ...products];
                     array.splice(i+1, 1);
                     await cartsCollection.updateOne({ userId: session.userId }, { $set: { produtos: array }});
                     const arrayProdutos = await cartsCollection.findOne({ userId: session.userId });
@@ -61,14 +60,15 @@ export async function addOne(req, res) {
                 }
             }
         } else {
-            console.log("não ta no carrinho")
             // Se o produto ainda não estiver no carrinho
-            const array = [{ name: product, qtd: 1 }, ...products];
+            const elemento = await db.collection("products").findOne({ name: product });
+            const array = [{ name: product, qtd: 1, preco: elemento.preco }, ...products];
             await cartsCollection.updateOne({ userId: session.userId }, { $set: { produtos: array }});
             const arrayProdutos = await cartsCollection.findOne({ userId: session.userId });
             return res.send(arrayProdutos.produtos).status(200);
         }
     } catch(error) {
+        console.log(error)
         return res.sendStatus(500);
     }
 }
@@ -99,7 +99,7 @@ export async function removeOne(req, res) {
                         const arrayProdutos = await cartsCollection.findOne({ userId: session.userId });
                         return res.send(arrayProdutos.produtos).status(200);
                     } else {
-                        const array = [{ name: product, qtd: quantidade }, ...products];
+                        const array = [{ name: product, qtd: quantidade, preco: products[i].preco }, ...products];
                         array.splice(i+1, 1);
                         await cartsCollection.updateOne({ userId: session.userId }, { $set: { produtos: array }});
                         const arrayProdutos = await cartsCollection.findOne({ userId: session.userId });
