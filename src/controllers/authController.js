@@ -22,10 +22,10 @@ export async function createUser(req,res){
         
         }else{
 
-            await db.collection("users").insertOne({...usuario , password: passwordCripted})
-          
-            return  res.status(201).send("usuario criado com sucesso")
-           
+            const userId = await db.collection("users").insertOne({...usuario , password: passwordCripted })
+            await db.collection("carts").insertOne({ userId: userId.insertedId, produtos: [] });
+        
+            return res.status(201).send("usuario criado com sucesso");
 
         }   
     
